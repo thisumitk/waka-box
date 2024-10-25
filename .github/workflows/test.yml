@@ -1,27 +1,36 @@
-name: Test WakaTime API
+name: Update gist with WakaTime stats
 on:
+  schedule:
+    - cron: "0 0 * * *"
   workflow_dispatch:
 
 jobs:
-  test-api:
+  update-gist:
     runs-on: ubuntu-latest
     environment: waka-box
     steps:
-      - name: Check WAKATIME_API_KEY
-        env:
-          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
+      - uses: actions/checkout@master
+      
+      - name: Test WakaTime API
         run: |
-          if [ -z "$WAKATIME_API_KEY" ]; then
-            echo "WAKATIME_API_KEY is not set!"
-          else
-            echo "WAKATIME_API_KEY is set."
-          fi
-
-      - name: Make API Call
-        env:
-          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
+          encoded=$(echo -n "${{ secrets.WAKATIME_API_KEY }}" | base64)
+          echo "Testing WakaTime API..."
+          response=$(curl -s "https://wakatime.com/api/v1/users/current/stats/last_7_days" \
+            -H "Authorization: Basic $encoded")
+          echo "WakaTime API Response:"
+          echo "$response" | jq .
+      
+      - name: Test Gist API
         run: |
-          echo $WAKATIME_API_KEY | base64 > auth.txt
-          curl -X GET "https://wakatime.com/api/v1/users/current/stats/last_7_days" \
-            -H "Authorization: Basic $(cat auth.txt)"
-          rm auth.txt
+          echo "Testing Gist API..."
+          response=$(curl -s "https://api.github.com/gists/${{ secrets.GIST_ID }}" \
+            -H "Authorization: token ${{ secrets.GH_TOKEN }}")
+          echo "Gist API Response:"
+          echo "$response" | jq .
+      
+      - name: Update gist
+        uses: matchai/waka-box@master
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GIST_ID: ${{ secrets.GIST_ID }}
+          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
