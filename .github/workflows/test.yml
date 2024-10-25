@@ -7,7 +7,7 @@ jobs:
     steps:
       - name: Check WAKATIME_API_KEY
         env:  # Define the environment for this step
-          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}  # Assign the secret to an env variable
+          WAKATIME_API_KEY: waka_fb60903e-3fe8-4053-b437-5cac63fe8aeb # Assign the secret to an env variable
         run: |
           if [ -z "$WAKATIME_API_KEY" ]; then
             echo "WAKATIME_API_KEY is not set!"
