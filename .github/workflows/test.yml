@@ -6,8 +6,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check WAKATIME_API_KEY
+        env:  # Define the environment for this step
+          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}  # Assign the secret to an env variable
         run: |
-          if [ -z "${{ secrets.WAKATIME_API_KEY }}" ]; then
+          if [ -z "$WAKATIME_API_KEY" ]; then
             echo "WAKATIME_API_KEY is not set!"
           else
             echo "WAKATIME_API_KEY is set."
