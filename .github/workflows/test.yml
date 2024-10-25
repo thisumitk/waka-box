@@ -9,4 +9,4 @@ jobs:
       - name: Make API Call
         run: |
           curl -X GET "https://wakatime.com/api/v1/users/current/stats/last_7_days" \
-          -H "Authorization: Basic $(echo -n '${{ secrets.WAKATIME_API_KEY }}' | base64)"
+          -H "Authorization: Basic $(echo -n '${{ secrets.WAKATIME_API_KEY }}"
