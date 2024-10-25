@@ -1,13 +1,14 @@
 name: Test WakaTime API
 on:
   workflow_dispatch:
+
 jobs:
   test-api:
     runs-on: ubuntu-latest
     steps:
       - name: Check WAKATIME_API_KEY
-        env:  # Define the environment for this step
-          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}  # Assign the secret to an env variable
+        env:
+          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
         run: |
           if [ -z "$WAKATIME_API_KEY" ]; then
             echo "WAKATIME_API_KEY is not set!"
@@ -16,6 +17,10 @@ jobs:
           fi
 
       - name: Make API Call
+        env:
+          WAKATIME_API_KEY: ${{ secrets.WAKATIME_API_KEY }}
         run: |
+          echo $WAKATIME_API_KEY | base64 > auth.txt
           curl -X GET "https://wakatime.com/api/v1/users/current/stats/last_7_days" \
-          -H "Authorization: Basic $(echo -n '${{ secrets.WAKATIME_API_KEY }}': | base64)"
+            -H "Authorization: Basic $(cat auth.txt)"
+          rm auth.txt
