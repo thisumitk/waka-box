@@ -11,23 +11,27 @@ jobs:
     steps:
       - uses: actions/checkout@master
       
-      - name: Test WakaTime API
+      - name: Test WakaTime API (Last 7 Days)
         run: |
           encoded=$(echo -n "${{ secrets.WAKATIME_API_KEY }}" | base64)
-          echo "Testing WakaTime API..."
-          response=$(curl -s "https://wakatime.com/api/v1/users/current/stats/last_7_days" \
-            -H "Authorization: Basic $encoded")
-          echo "WakaTime API Response:"
-          echo "$response" | jq .
-      
-      - name: Test Gist API
+          echo "Testing WakaTime API for last 7 days..."
+          curl -s "https://wakatime.com/api/v1/users/current/stats/last_7_days" \
+            -H "Authorization: Basic $encoded" | jq .
+
+      - name: Test WakaTime API (Today)
         run: |
-          echo "Testing Gist API..."
-          response=$(curl -s "https://api.github.com/gists/${{ secrets.GIST_ID }}" \
-            -H "Authorization: token ${{ secrets.GH_TOKEN }}")
-          echo "Gist API Response:"
-          echo "$response" | jq .
-      
+          encoded=$(echo -n "${{ secrets.WAKATIME_API_KEY }}" | base64)
+          echo "Testing WakaTime API for today..."
+          curl -s "https://wakatime.com/api/v1/users/current/summaries?range=today" \
+            -H "Authorization: Basic $encoded" | jq .
+
+      - name: Test WakaTime API (Status)
+        run: |
+          encoded=$(echo -n "${{ secrets.WAKATIME_API_KEY }}" | base64)
+          echo "Testing WakaTime API status..."
+          curl -s "https://wakatime.com/api/v1/users/current/status/all_time" \
+            -H "Authorization: Basic $encoded" | jq .
+
       - name: Update gist
         uses: matchai/waka-box@master
         env:
